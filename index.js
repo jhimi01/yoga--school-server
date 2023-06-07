@@ -1,5 +1,6 @@
 const express = require('express')
 var cors = require('cors')
+require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 5000
 
@@ -12,7 +13,16 @@ app.use(cors())
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
+
+
+// const uri = `mongodb+srv://yoga-school:dMIPb2xbfxyu9mdd@cluster0.ysrfscy.mongodb.net/?retryWrites=true&w=majority`;
+
+// ${process.env.YOGA_SCHOOL}
+// ${process.env.YOGA_SCHOOL_PASSWORD}
+
 const uri = `mongodb+srv://${process.env.YOGA_SCHOOL}:${process.env.YOGA_SCHOOL_PASSWORD}@cluster0.ysrfscy.mongodb.net/?retryWrites=true&w=majority`;
+console.log(uri)
+
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
