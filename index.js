@@ -34,6 +34,8 @@ async function run() {
     await client.connect();
 
     const userCollection = client.db('yoga-school').collection('users');
+    const classCollection = client.db('yoga-school').collection('classes');
+    const instructorCollection = client.db('yoga-school').collection('instructors');
 
 //   save user email and role in db
 app.put('/users/:email', async(req, res) =>{
@@ -41,7 +43,6 @@ app.put('/users/:email', async(req, res) =>{
   const user = req.body;
     // Set the default role to "student"
     user.role = 'student';
-
   const query = { email: email}
   const options = { upsert: true }
   const updateDoc = {
@@ -50,6 +51,27 @@ app.put('/users/:email', async(req, res) =>{
   const result = await userCollection.updateOne(query, updateDoc ,options);
   res.send(result)
 })
+
+// get all users
+app.get('/users', async(req, res) =>{
+  const result = await userCollection.find().toArray()
+  res.send(result)
+})
+
+
+// make instructor to student 
+app.patch('/users/instructor/:email', async(req, res) =>{
+   const email = req.params.email;
+   const filter = {email: email}
+   const updateDoc = {
+    $set:{
+      role: 'admin'
+    },
+   }
+   const result = await userCollection.updateOne(filter, updateDoc);
+   res.send(result)
+
+});
 
 
 
