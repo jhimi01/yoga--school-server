@@ -14,14 +14,8 @@ app.use(cors())
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-
-// const uri = `mongodb+srv://yoga-school:dMIPb2xbfxyu9mdd@cluster0.ysrfscy.mongodb.net/?retryWrites=true&w=majority`;
-
-// ${process.env.YOGA_SCHOOL}
-// ${process.env.YOGA_SCHOOL_PASSWORD}
-
 const uri = `mongodb+srv://${process.env.YOGA_SCHOOL}:${process.env.YOGA_SCHOOL_PASSWORD}@cluster0.ysrfscy.mongodb.net/?retryWrites=true&w=majority`;
-console.log(uri)
+
 
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -37,6 +31,22 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const userCollection = client.db('yoga-school').collection('users');
+
+
+
+    app.put('/users/:email', async(req, res)=>{
+      const email = req.params.email;;
+      const user = req.body;
+      const query = {email: email}
+      const options = { upsert: true}
+      const updateDoc = {
+        $set: user
+      }
+      const result = await userCollection.updateOne(query,updateDoc, options);
+      res.send(result);
+    })
 
 
 
