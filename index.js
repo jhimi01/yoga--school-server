@@ -1,6 +1,6 @@
 const express = require('express')
 var cors = require('cors')
-require('dotenv').config()
+require('dotenv').config();
 const app = express()
 const port = process.env.PORT || 5000
 
@@ -14,8 +14,9 @@ app.use(cors())
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const uri = `mongodb+srv://${process.env.YOGA_SCHOOL}:${process.env.YOGA_SCHOOL_PASSWORD}@cluster0.ysrfscy.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://${process.env.YOGA_SCHOOL}:${process.env.YOGA_SCHOOL_PASSWORD}@cluster0.ysrfscy.mongodb.net/?retryWrites=true&w=majority`;
 
+const uri = `mongodb://${process.env.YOGA_SCHOOL}:${process.env.YOGA_SCHOOL_PASSWORD}@ac-ia0nlto-shard-00-00.ysrfscy.mongodb.net:27017,ac-ia0nlto-shard-00-01.ysrfscy.mongodb.net:27017,ac-ia0nlto-shard-00-02.ysrfscy.mongodb.net:27017/?ssl=true&replicaSet=atlas-24z2ze-shard-0&authSource=admin&retryWrites=true&w=majority`;
 
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -34,20 +35,21 @@ async function run() {
 
     const userCollection = client.db('yoga-school').collection('users');
 
+//   save user email and role in db
+app.put('/users/:email', async(req, res) =>{
+  const email = req.params.email;
+  const user = req.body;
+    // Set the default role to "student"
+    user.role = 'student';
 
-
-    app.put('/users/:email', async(req, res)=>{
-      const email = req.params.email;;
-      const user = req.body;
-      const query = {email: email}
-      const options = { upsert: true}
-      const updateDoc = {
-        $set: user
-      }
-      const result = await userCollection.updateOne(query,updateDoc, options);
-      res.send(result);
-    })
-
+  const query = { email: email}
+  const options = { upsert: true }
+  const updateDoc = {
+    $set: user
+  }
+  const result = await userCollection.updateOne(query, updateDoc ,options);
+  res.send(result)
+})
 
 
 
