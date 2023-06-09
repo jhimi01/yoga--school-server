@@ -136,10 +136,12 @@ app.post('/users/selectclass/:id', async(req, res) =>{
 })
 
 // get selected classess
-// app.get('', async (req, res) =>{
-//   const result = await classCollection.find().toArray();
-//   res.send(result)
-// })
+app.get('/users/selectclass/:email', async (req, res) =>{
+  const email= req.params.email;
+  const query = {email: email}
+  const result = await selectCollect.find(query).toArray();
+  res.send(result)
+})
 
 // get instructor- my class
 // app.get(`/users/instructor/myclass/:email`, async(req, res) =>{
