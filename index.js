@@ -126,6 +126,26 @@ app.get('/users/addclass', async(req, res) => {
 })
 
 
+// get instructor- my class
+// app.get(`/users/instructor/myclass/:email`, async(req, res) =>{
+// const email = req.params.email;
+// const filter = {email: email}
+// const result = await classCollection.find(filter).toArray()
+// res.send(result)
+// })
+
+// Get classes posted by a single instructor
+app.get('/instructors/:email/classes', async (req, res) => {
+  const email = req.params.email;
+  const query = { instructorEmail: email };
+  const result = await classCollection.find(query).toArray();
+  res.send(result);
+});
+
+
+
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
