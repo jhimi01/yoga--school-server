@@ -35,7 +35,7 @@ async function run() {
 
     const userCollection = client.db('yoga-school').collection('users');
     const classCollection = client.db('yoga-school').collection('classes');
-    const instructorCollection = client.db('yoga-school').collection('instructors');
+    const selectCollect = client.db('yoga-school').collection('selectClass');
 
 //   save user email and role in db
 app.put('/users/:email', async(req, res) =>{
@@ -125,6 +125,21 @@ app.get('/users/addclass', async(req, res) => {
   res.send(result)
 })
 
+
+// select class as a student
+app.post('/users/selectclass/:id', async(req, res) =>{
+       const id = req.params.id;
+       const selectedClass = req.body;
+       
+       const result = await selectCollect.insertOne(selectedClass);
+       res.send(result)
+})
+
+// get selected classess
+// app.get('', async (req, res) =>{
+//   const result = await classCollection.find().toArray();
+//   res.send(result)
+// })
 
 // get instructor- my class
 // app.get(`/users/instructor/myclass/:email`, async(req, res) =>{
