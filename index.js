@@ -112,6 +112,19 @@ app.patch('/users/admin/:email', async(req, res) =>{
 });
 
 
+// add all classes
+app.post('/users/addclass', async(req, res) =>{
+  const body = req.body
+  const result = await classCollection.insertOne(body)
+  res.send(result)
+})
+
+// get all classes
+app.get('/users/addclass', async(req, res) => {
+  const result = await classCollection.find().toArray();
+  res.send(result)
+})
+
 
 
     // Send a ping to confirm a successful connection
