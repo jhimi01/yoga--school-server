@@ -12,7 +12,7 @@ app.use(cors())
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // const uri = `mongodb+srv://${process.env.YOGA_SCHOOL}:${process.env.YOGA_SCHOOL_PASSWORD}@cluster0.ysrfscy.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -57,6 +57,23 @@ app.get('/users', async(req, res) =>{
   const result = await userCollection.find().toArray()
   res.send(result)
 })
+
+// get specific item details of users
+// app.get(`/users/role/:id`, async(req, res) =>{
+//   const id = req.params.id;
+//   const query = { _id : new ObjectId(id)};
+//   const result = await userCollection.find(query).toArray();
+//   res.send(result)
+// });
+
+
+// get role details
+app.get(`/users/:email`, async(req, res) =>{
+  const email = req.params.email;
+  const query = { email : email};
+  const result = await userCollection.find(query).toArray()
+  res.send(result)
+});
 
 
 // make instructor to student 
