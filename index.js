@@ -68,7 +68,7 @@ app.get('/users', async(req, res) =>{
 
 
 // get role details
-app.get(`/users/:email`, async(req, res) =>{
+app.get(`/users/role/:email`, async(req, res) =>{
   const email = req.params.email;
   const query = { email : email};
   const result = await userCollection.find(query).toArray()
