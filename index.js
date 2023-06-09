@@ -89,6 +89,15 @@ app.patch('/users/instructor/:email', async(req, res) =>{
    res.send(result)
 });
 
+
+// get all instructor
+app.get(`/users/instructor`, async(req, res) =>{
+ const filter = {role: 'instructor'}
+ const result = await userCollection.find(filter).toArray()
+ res.send(result)
+});
+
+
 // make instructor to admin 
 app.patch('/users/admin/:email', async(req, res) =>{
    const email = req.params.email;
