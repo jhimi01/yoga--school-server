@@ -82,12 +82,24 @@ app.patch('/users/instructor/:email', async(req, res) =>{
    const filter = {email: email}
    const updateDoc = {
     $set:{
+      role: 'instructor'
+    },
+   }
+   const result = await userCollection.updateOne(filter, updateDoc);
+   res.send(result)
+});
+
+// make instructor to admin 
+app.patch('/users/admin/:email', async(req, res) =>{
+   const email = req.params.email;
+   const filter = {email: email}
+   const updateDoc = {
+    $set:{
       role: 'admin'
     },
    }
    const result = await userCollection.updateOne(filter, updateDoc);
    res.send(result)
-
 });
 
 
