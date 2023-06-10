@@ -1,5 +1,6 @@
 const express = require('express')
 var cors = require('cors')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb'); 
 require('dotenv').config();
 const app = express()
 const port = process.env.PORT || 5000
@@ -9,10 +10,6 @@ const port = process.env.PORT || 5000
 app.use(express.json())
 app.use(cors())
 
-
-
-
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // const uri = `mongodb+srv://${process.env.YOGA_SCHOOL}:${process.env.YOGA_SCHOOL_PASSWORD}@cluster0.ysrfscy.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -112,48 +109,19 @@ app.patch('/users/admin/:email', async(req, res) =>{
 });
 
 
-// add all classes
+// add all classes by instructor
 app.post('/users/addclass', async(req, res) =>{
   const body = req.body
   const result = await classCollection.insertOne(body)
   res.send(result)
 })
 
-// get all classes
+// get all classes posted by instructor
 app.get('/users/addclass', async(req, res) => {
   const result = await classCollection.find().toArray();
   res.send(result)
 })
 
-
-// select class as a student
-app.post('/users/selectclass/:id', async(req, res) =>{
-       const id = req.params.id;
-       const selectedClass = req.body;
-       
-       const result = await selectCollect.insertOne(selectedClass);
-       res.send(result)
-})
-
-// get selected classess
-app.get('/users/selectclass/my-class', async (req, res) =>{
-  // const email= req.params.email;
- const email =  req.query.email;
- if (!email){
-  res.send([])
- }
-  const query = {email: email}
-  const result = await selectCollect.find(query).toArray();
-  res.send(result)
-})
-
-// get instructor- my class
-// app.get(`/users/instructor/myclass/:email`, async(req, res) =>{
-// const email = req.params.email;
-// const filter = {email: email}
-// const result = await classCollection.find(filter).toArray()
-// res.send(result)
-// })
 
 // Get classes posted by a single instructor
 app.get('/instructors/:email/classes', async (req, res) => {
@@ -165,6 +133,96 @@ app.get('/instructors/:email/classes', async (req, res) => {
 
 
 
+// select class as a student
+// app.post('/users/selectclass', async(req, res) =>{
+//   // const id = req.params.id;
+//   const selectedClass = req.body;
+  
+//   const result = await selectCollect.insertOne(selectedClass);
+//   res.send(result)
+// })
+app.post('/users/selectclass', async(req, res) =>{
+  // const id = req.params.id;
+  const selectedClass = req.body;
+  const result = await selectCollect.insertOne(selectedClass);
+  res.send(result)
+})
+
+
+// get selected classess
+// app.get('/users/selectclass/my-class', async (req, res) =>{
+//   // const email= req.params.email;
+//  const email =  req.query.email;
+//  if (!email){
+//   res.send([])
+//  }
+//   const query = {email: email}
+//   const result = await selectCollect.find(query).toArray();
+//   res.send(result)
+// })
+// ----------------------------
+app.get(`/users/selectclass/:email`, async (req, res) =>{
+  // const email= req.params.email;
+ const email =  req.params.email;
+ if (!email){
+  res.send([])
+ }
+  const query = {email: email}
+  const result = await selectCollect.find(query).toArray();
+  res.send(result)
+})
+
+
+
+
+
+
+// delete selected btn
+// app.delete('/users/selectclass/delete/:id', async (req,res) =>{
+//    const id = req.params.id;
+//   //  const query = {_id: new ObjectId(id)};
+//   //  const result = await selectCollect.deleteOne(query);
+//    const result = await selectCollect.deleteOne({_id: new ObjectId(id)});
+//    res.send(result)
+// });
+
+
+// Delete selected class
+// app.delete('/users/selectclass/delete/:id', async (req, res) => {
+//   const id = req.params.id;
+//   console.log(id)
+//   const query = { _id: new ObjectId(id) };
+//     const result = await selectCollect.deleteOne(query);
+
+//   try {
+//     const result = await selectCollect.deleteOne(query);
+
+//     if (result.deletedCount === 1) {
+//       res.json({ success: true, message: 'Selected class deleted successfully.' });
+//     } else {
+//       res.json({ success: false, message: 'Selected class not found.' });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ success: false, message: 'An error occurred while deleting the selected class.' });
+//   }
+// });
+
+app.delete('/users/selectclass/delete/:id', async (req, res) => {
+  const id = req.params.id;
+  console.log(id)
+  const result = await  selectCollect.deleteOne({ _id: new ObjectId(id)})
+  res.send(result)
+})
+
+// // get selected data
+// app.get('/users/selectclass/delete/:id', async(req, res) =>{
+//   const id = req.params.id;
+//   console.log(id)
+//   const query = { _id : new ObjectId(id)};
+//   const result = await selectCollect.find(query).toArray();
+//   res.send(result)
+// });
 
 
 
