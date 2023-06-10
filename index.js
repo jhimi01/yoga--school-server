@@ -136,8 +136,12 @@ app.post('/users/selectclass/:id', async(req, res) =>{
 })
 
 // get selected classess
-app.get('/users/selectclass/:email', async (req, res) =>{
-  const email= req.params.email;
+app.get('/users/selectclass/my-class', async (req, res) =>{
+  // const email= req.params.email;
+ const email =  req.query.email;
+ if (!email){
+  res.send([])
+ }
   const query = {email: email}
   const result = await selectCollect.find(query).toArray();
   res.send(result)
