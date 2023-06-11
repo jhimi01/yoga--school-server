@@ -55,14 +55,6 @@ app.get('/users', async(req, res) =>{
   res.send(result)
 })
 
-// get specific item details of users
-// app.get(`/users/role/:id`, async(req, res) =>{
-//   const id = req.params.id;
-//   const query = { _id : new ObjectId(id)};
-//   const result = await userCollection.find(query).toArray();
-//   res.send(result)
-// });
-
 
 // get role details
 app.get(`/users/role/:email`, async(req, res) =>{
@@ -127,7 +119,7 @@ app.patch('/users/addclass/approve/:id', async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
   const updateDoc = {
-    $set: { status: 'approved' } // Assuming 'status' is the field to update
+    $set: { status: 'approved' }
   };
   const result = await classCollection.updateOne(query, updateDoc);
   res.send(result);
@@ -138,37 +130,27 @@ app.patch('/users/addclass/deny/:id', async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
   const updateDoc = {
-    $set: { status: 'deny' } // Assuming 'status' is the field to update
+    $set: { status: 'deny' }
   };
   const result = await classCollection.updateOne(query, updateDoc);
   res.send(result);
 });
 
 
-// update class status deny
-// Update class status to 'deny' and add feedback
-app.patch('/users/addclass/deny/:id', async (req, res) => {
-  try {
-    const id = req.params.id;
-    const query = { _id: new ObjectId(id) };
-    const updateDoc = {
-      $set: { status: 'deny' }
-    };
-
-    // Check if feedback exists in the request body
-    if (req.body.feedback) {
-      updateDoc.$set.feedback = req.body.feedback;
+// give a feedback
+app.put('/users/feedback/:id', async (req, res) => {
+  const id = req.params.id;
+  const feedback = req.body;
+  const query = { _id: new ObjectId(id) };
+  const options = { upsert: true }
+  const updateDoc = {
+    $set:{
+      feedback
     }
-
-    const result = await classCollection.updateOne(query, updateDoc);
-    res.json(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+  };
+  const result = await classCollection.updateOne(query, updateDoc, options);
+  res.send(result);
 });
-
-
 
 // Get classes posted by a single instructor
 app.get('/instructors/:email/classes', async (req, res) => {
