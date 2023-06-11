@@ -122,6 +122,53 @@ app.get('/users/addclass', async(req, res) => {
   res.send(result)
 })
 
+// update class status admin
+app.patch('/users/addclass/approve/:id', async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: { status: 'approved' } // Assuming 'status' is the field to update
+  };
+  const result = await classCollection.updateOne(query, updateDoc);
+  res.send(result);
+});
+
+// update class status deny
+app.patch('/users/addclass/deny/:id', async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: { status: 'deny' } // Assuming 'status' is the field to update
+  };
+  const result = await classCollection.updateOne(query, updateDoc);
+  res.send(result);
+});
+
+
+// update class status deny
+// Update class status to 'deny' and add feedback
+app.patch('/users/addclass/deny/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $set: { status: 'deny' }
+    };
+
+    // Check if feedback exists in the request body
+    if (req.body.feedback) {
+      updateDoc.$set.feedback = req.body.feedback;
+    }
+
+    const result = await classCollection.updateOne(query, updateDoc);
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 
 // Get classes posted by a single instructor
 app.get('/instructors/:email/classes', async (req, res) => {
@@ -194,36 +241,6 @@ app.get(`/users/selectclass/:email`, async (req, res) =>{
 
 
 
-// delete selected btn
-// app.delete('/users/selectclass/delete/:id', async (req,res) =>{
-//    const id = req.params.id;
-//   //  const query = {_id: new ObjectId(id)};
-//   //  const result = await selectCollect.deleteOne(query);
-//    const result = await selectCollect.deleteOne({_id: new ObjectId(id)});
-//    res.send(result)
-// });
-
-
-// Delete selected class
-// app.delete('/users/selectclass/delete/:id', async (req, res) => {
-//   const id = req.params.id;
-//   console.log(id)
-//   const query = { _id: new ObjectId(id) };
-//     const result = await selectCollect.deleteOne(query);
-
-//   try {
-//     const result = await selectCollect.deleteOne(query);
-
-//     if (result.deletedCount === 1) {
-//       res.json({ success: true, message: 'Selected class deleted successfully.' });
-//     } else {
-//       res.json({ success: false, message: 'Selected class not found.' });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false, message: 'An error occurred while deleting the selected class.' });
-//   }
-// });
 
 app.delete('/users/selectclass/delete/:id', async (req, res) => {
   const id = req.params.id;
@@ -231,16 +248,6 @@ app.delete('/users/selectclass/delete/:id', async (req, res) => {
   const result = await  selectCollect.deleteOne({ _id: new ObjectId(id)})
   res.send(result)
 })
-
-// // get selected data
-// app.get('/users/selectclass/delete/:id', async(req, res) =>{
-//   const id = req.params.id;
-//   console.log(id)
-//   const query = { _id : new ObjectId(id)};
-//   const result = await selectCollect.find(query).toArray();
-//   res.send(result)
-// });
-
 
 
     // Send a ping to confirm a successful connection
