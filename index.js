@@ -131,6 +131,23 @@ app.get('/instructors/:email/classes', async (req, res) => {
   res.send(result);
 });
 
+// update one instructor class
+app.put(`/instructors/class/update/:id`, async (req, res) => {
+  const id = req.params.id;
+  const { className, classImage, availableSeats, price } = req.body; // Destructure the properties from req.body
+  const filter = { _id: new ObjectId(id) };
+  const update = {
+    $set: {
+      className,
+      classImage,
+      availableSeats,
+      price,
+    },
+  };
+
+  const result = await classCollection.updateOne(filter, update);
+  res.send(result);
+});
 
 
 // select class as a student
@@ -210,7 +227,7 @@ app.get(`/users/selectclass/:email`, async (req, res) =>{
 
 app.delete('/users/selectclass/delete/:id', async (req, res) => {
   const id = req.params.id;
-  console.log(id)
+  // console.log(id)
   const result = await  selectCollect.deleteOne({ _id: new ObjectId(id)})
   res.send(result)
 })
