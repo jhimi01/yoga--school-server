@@ -1,5 +1,6 @@
 const express = require('express')
-var cors = require('cors')
+const cors = require('cors')
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb'); 
 require('dotenv').config();
 const app = express()
@@ -11,7 +12,6 @@ app.use(express.json())
 app.use(cors())
 
 
-// const uri = `mongodb+srv://${process.env.YOGA_SCHOOL}:${process.env.YOGA_SCHOOL_PASSWORD}@cluster0.ysrfscy.mongodb.net/?retryWrites=true&w=majority`;
 
 const uri = `mongodb://${process.env.YOGA_SCHOOL}:${process.env.YOGA_SCHOOL_PASSWORD}@ac-ia0nlto-shard-00-00.ysrfscy.mongodb.net:27017,ac-ia0nlto-shard-00-01.ysrfscy.mongodb.net:27017,ac-ia0nlto-shard-00-02.ysrfscy.mongodb.net:27017/?ssl=true&replicaSet=atlas-24z2ze-shard-0&authSource=admin&retryWrites=true&w=majority`;
 
@@ -25,6 +25,26 @@ const client = new MongoClient(uri, {
   }
 });
 
+const verifyJWT = (req, res, next) => {
+  const authorization = req.headers.authorization;
+  console.log(authorization)
+  if (!authorization) {
+    return res.status(401).send({ error: true, message: 'unauthorized access' });
+  }
+  const token = authorization.split(' ')[1];
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRETE, (err, decoded) => {
+    // console.log(err, decoded)
+    if (err) {
+      return res.status(401).send({ error: true, message: 'unauthorized access' });
+    }
+    req.decoded = decoded;
+    next();
+  });
+};
+
+
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -33,6 +53,16 @@ async function run() {
     const userCollection = client.db('yoga-school').collection('users');
     const classCollection = client.db('yoga-school').collection('classes');
     const selectCollect = client.db('yoga-school').collection('selectClass');
+
+
+    // ----------- JWT ----------------
+    app.post('/jwt', (req, res) => {
+      const email = req.body;
+      const token = jwt.sign(email, process.env.ACCESS_TOKEN_SECRETE, { expiresIn: '7d' })
+      res.send({token})
+    })
+
+
 
 //   save user email and role in db
 app.put('/users/:email', async(req, res) =>{
@@ -85,6 +115,24 @@ app.get(`/users/instructor`, async(req, res) =>{
  const result = await userCollection.find(filter).toArray()
  res.send(result)
 });
+
+
+
+// Get classes posted by a single instructor
+app.get('/instructors/:email/classes',verifyJWT, async (req, res) => {
+  const email = req.params.email;
+  const decodedEmail = req.decoded.email
+  // console.log('decode', decodedEmail)
+  if (email !== decodedEmail) {
+
+      return res.status(403).send({error: true, message: 'forbidden access'});
+     
+  }
+  const query = { instructorEmail: email };
+  const result = await classCollection.find(query).toArray();
+  res.send(result);
+});
+
 
 
 // make instructor to admin 
@@ -152,13 +200,6 @@ app.put('/users/feedback/:id', async (req, res) => {
   res.send(result);
 });
 
-// Get classes posted by a single instructor
-app.get('/instructors/:email/classes', async (req, res) => {
-  const email = req.params.email;
-  const query = { instructorEmail: email };
-  const result = await classCollection.find(query).toArray();
-  res.send(result);
-});
 
 // update one instructor class
 app.put(`/instructors/class/update/:id`, async (req, res) => {
@@ -179,14 +220,6 @@ app.put(`/instructors/class/update/:id`, async (req, res) => {
 });
 
 
-// select class as a student
-// app.post('/users/selectclass', async(req, res) =>{
-//   // const id = req.params.id;
-//   const selectedClass = req.body;
-  
-//   const result = await selectCollect.insertOne(selectedClass);
-//   res.send(result)
-// })
 app.post('/users/selectclass', async(req, res) =>{
   // const id = req.params.id;
   const selectedClass = req.body;
@@ -194,7 +227,7 @@ app.post('/users/selectclass', async(req, res) =>{
   res.send(result)
 })
 
-
+// -------------------------------------------------------------------------------
 // get selected classess
 // app.get('/users/selectclass/my-class', async (req, res) =>{
 //   // const email= req.params.email;
@@ -207,16 +240,34 @@ app.post('/users/selectclass', async(req, res) =>{
 //   res.send(result)
 // })
 // ----------------------------
-app.get(`/users/selectclass/:email`, async (req, res) =>{
-  // const email= req.params.email;
+app.get(`/users/selectclass/:email`,
+ verifyJWT,  
+ async (req, res) =>{
+
+  const decodedEmail = req.decoded.email
  const email =  req.params.email;
+//  console.log('decodedEmail', decodedEmail)
+//  console.log('Email', email)
+
+ if (email !== decodedEmail) {
+  return res.status(403).send({error: true, message: 'forbidden access'});
+ }
+
  if (!email){
   res.send([])
  }
+
   const query = {email: email}
   const result = await selectCollect.find(query).toArray();
   res.send(result)
 })
+
+app.get('/users/selectclass/payment/:id', async(req, res) =>{
+  const id = req.params.id;
+  const query = {_id: new ObjectId(id)};
+  const result = await selectCollect.findOne(query);
+  res.send(result);
+});
 
 
 
