@@ -161,7 +161,15 @@ app.post('/users/addclass', async(req, res) =>{
 })
 
 // get all classes posted by instructor
-app.get('/users/addclass', async(req, res) => {
+app.get('/users/addclass/:email',verifyJWT, async(req, res) => {
+  const email = req.params.email;
+  const decodedEmail = req.decoded.email
+  // console.log('decode', decodedEmail)
+  if (email !== decodedEmail) {
+
+      return res.status(403).send({error: true, message: 'forbidden access'});
+     
+  }
   const result = await classCollection.find().toArray();
   res.send(result)
 })
