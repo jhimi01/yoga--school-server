@@ -4,7 +4,10 @@ const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb'); 
 require('dotenv').config();
 const app = express()
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
+// This is your test secret API key.
+const stripe = require("stripe")(process.env.VITE_SECRETE_PAYMENT);
+
 
 
 // middleware
@@ -53,6 +56,7 @@ async function run() {
     const userCollection = client.db('yoga-school').collection('users');
     const classCollection = client.db('yoga-school').collection('classes');
     const selectCollect = client.db('yoga-school').collection('selectClass');
+    const paymentCollect = client.db('yoga-school').collection('paymentItem');
 
 
     // ----------- JWT ----------------
@@ -281,6 +285,24 @@ app.delete('/users/selectclass/delete/:id', async (req, res) => {
   const result = await  selectCollect.deleteOne({ _id: new ObjectId(id)})
   res.send(result)
 })
+
+
+// create payment intent
+app.post('/create-payment-intent', async (req, res) =>{
+  const { price } = req.body;
+  const amount  = price*100;
+  console.log(price, amount)
+  const paymentIntent =  await stripe.paymentIntents.create({
+    amount: amount,
+    currency: "usd",
+    payment_method_types: ["card"],
+  })
+  res.send({
+    clientSecret: paymentIntent.client_secret,
+  });
+})
+
+
 
 
     // Send a ping to confirm a successful connection
