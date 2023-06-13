@@ -275,16 +275,29 @@ app.get('/users/selectclass/payment/:id', async(req, res) =>{
 
 
 
-
-
-
-
+// delete a single selected class
 app.delete('/users/selectclass/delete/:id', async (req, res) => {
   const id = req.params.id;
-  // console.log(id)
   const result = await  selectCollect.deleteOne({ _id: new ObjectId(id)})
   res.send(result)
 })
+
+
+// after enroll that class will be post in another collection
+app.post('/enrolled/class', async (req, res) => {
+  const enrolledclass = req.body;
+  const result = await paymentCollect.insertOne(enrolledclass)
+  res.send(result)
+})
+
+
+
+// get enrolled classes from collection
+app.get('/enrolled/class', async (req, res) => {
+  const enrolledClasses = await paymentCollect.find().sort({ timestamp: -1 }).toArray();
+  res.send(enrolledClasses);
+});
+
 
 
 // create payment intent
