@@ -274,7 +274,6 @@ app.get('/users/selectclass/payment/:id', async(req, res) =>{
 });
 
 
-
 // delete a single selected class
 app.delete('/users/selectclass/delete/:id', async (req, res) => {
   const id = req.params.id;
@@ -293,10 +292,44 @@ app.post('/enrolled/class', async (req, res) => {
 
 
 // get enrolled classes from collection
-app.get('/enrolled/class', async (req, res) => {
-  const enrolledClasses = await paymentCollect.find().sort({ timestamp: -1 }).toArray();
+app.get('/enrolled/class/:email', async (req, res) => {
+  const email = req.params.email;
+  const query = { studentEmail: email}
+  const enrolledClasses = await paymentCollect.find(query).sort({ timestamp: -1 }).toArray();
   res.send(enrolledClasses);
 });
+
+
+// available and enrolled section update
+// app.put('/enrolled/update/:id', async (req, res) => {
+//   const id = req.params.id;
+//   const {availableSeats, Enrolled} = req.body;
+//   const filter = {_id: new ObjectId(id)};
+//   updateDoc = {
+//     $set : {
+//       availableSeats,
+//       Enrolled
+//     },
+//   }
+//   const result = await classCollection.updateOne(filter, updateDoc);
+//   res.send(result);
+// });
+app.put('/enrolled/update/:id', async (req, res) => {
+  const id = req.params.id;
+  const { availableSeats, Enrolled } = req.body;
+  const filter = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      availableSeats,
+      Enrolled
+    },
+  };
+  const result = await classCollection.updateOne(filter, updateDoc);
+  res.send(result);
+});
+
+
+
 
 
 
