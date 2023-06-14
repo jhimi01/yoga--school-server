@@ -51,7 +51,7 @@ const verifyJWT = (req, res, next) => {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const userCollection = client.db('yoga-school').collection('users');
     const classCollection = client.db('yoga-school').collection('classes');
@@ -122,7 +122,7 @@ app.get(`/users/instructor`, async(req, res) =>{
 
 
 
-// Get classes posted by a single instructor
+// Get classes posted by a single instructor----------------------
 app.get('/instructors/:email/classes',verifyJWT, async (req, res) => {
   const email = req.params.email;
   const decodedEmail = req.decoded.email
@@ -139,7 +139,7 @@ app.get('/instructors/:email/classes',verifyJWT, async (req, res) => {
 
 
 
-// make instructor to admin 
+// make instructor to admin ----------------------------
 app.patch('/users/admin/:email', async(req, res) =>{
    const email = req.params.email;
    const filter = {email: email}
@@ -153,23 +153,23 @@ app.patch('/users/admin/:email', async(req, res) =>{
 });
 
 
-// add all classes by instructor
+// add all classes by instructor------------------------
 app.post('/users/addclass', async(req, res) =>{
   const body = req.body
   const result = await classCollection.insertOne(body)
   res.send(result)
 })
 
-// get all classes posted by instructor
-app.get('/users/addclass/:email',verifyJWT, async(req, res) => {
-  const email = req.params.email;
-  const decodedEmail = req.decoded.email
-  // console.log('decode', decodedEmail)
-  if (email !== decodedEmail) {
+// get all classes posted by instructor------------------
+app.get('/users/addclass/', async(req, res) => {
+  // const email = req.params.email;
+  // const decodedEmail = req.decoded.email
+  // // console.log('decode', decodedEmail)
+  // if (email !== decodedEmail) {
 
-      return res.status(403).send({error: true, message: 'forbidden access'});
+  //     return res.status(403).send({error: true, message: 'forbidden access'});
      
-  }
+  // }
   const result = await classCollection.find().toArray();
   res.send(result)
 })
